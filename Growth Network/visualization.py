@@ -1,62 +1,31 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-from collections import defaultdict
+from chromosome import *
+import os
 
-def generate_layer_positions(nodes):
+def create_directed_graph(c:Chromosome):
+    g = nx.DiGraph()
+    for node in c.nodes:
+        g.add_node(node.id, layer=node.layer)
+    for edge in c.edges:
+        g.add_edge(edge.node, edge.out_edge_to, weight=edge.weight)
+    return g
 
-    layer_nodes = defaultdict(list)
 
-    # Group nodes by their layer
-    for node in nodes:
-        if node.type == 'input':
-            layer_nodes[0].append(node)
-        elif node.type == 'output':
-            layer_nodes['output'].append(node)
-        else:
-            layer_nodes[node.type].append(node)
-
-    # Determine number of hidden layers and output layer x-position
-    hidden_layers = sorted([k for k in layer_nodes.keys() if isinstance(k, int)])
-    max_hidden_layer = max(hidden_layers) if hidden_layers else 0
-    output_layer_x = max_hidden_layer + 1
-
-    # Assign x-values
-    layer_x = {}
-    layer_x[0] = 0  # Input layer
-    for i, layer in enumerate(hidden_layers):
-        layer_x[layer] = i + 1
-    layer_x['output'] = output_layer_x
-
-    # Assign y-positions
-    positions = {}
-    for layer, nodes_in_layer in layer_nodes.items():
-        x = layer_x[layer]
-        num_nodes = len(nodes_in_layer)
-        y_spacing = 1
-        y_start = -((num_nodes - 1) / 2) * y_spacing
-        for i, node in enumerate(nodes_in_layer):
-            y = y_start + i * y_spacing
-            positions[node.id] = (x, y)
-
-    return positions
-
-def plot_chromosome(chromosome):
-    # Create adjacency matrix and neuron-to-index mapping
-    adj_matrix, neuron_to_index = chromosome.create_adjacency_matrix()
-
-    # Create a directed graph from the adjacency matrix
-    gA = nx.from_numpy_array(adj_matrix, create_using=nx.DiGraph())
-
-    # Generate positions for nodes
-    layer_positions = generate_layer_positions(chromosome.nodes)
-
-    # Extract edge weights
-    edges = gA.edges()
-    weights = [gA[u][v]['weight'] for u, v in edges]
-    scaled_weights = [5 * abs(w) for w in weights]  # Scale edge widths
-
-    # Draw the graph
-    nx.draw(gA, pos=layer_positions, with_labels=True,
-            node_color='lightblue', node_size=1500,
-            arrowsize=20, width=scaled_weights)
-    plt.show()
+def plot_chromosome(c:Chromosome, width_scale:float=3.0, min_width:float=0.5):
+    print("Making graph")
+    g = create_directed_graph(c)
+    pos = nx.multipartite_layout(g, subset_key='layer', align='vertical', scale=1, center=None)
+    edge_weights = [g[u][v]['weight'] for u, v in g.edges()]
+    edge_widths = [max(min_width, abs(weight) * width_scale) for weight in edge_weights]
+    print("Drawing graph")
+    nx.draw_networkx_nodes(g, pos, node_size=400)
+    nx.draw_networkx_labels(g, pos, font_size=10)
+    nx.draw_networkx_edges(g, pos, edgelist=g.edges(), width=edge_widths)
+    print("Saving graph")
+    path_name = "figs"
+    fig_name = f"chromosome-{c.c_id}.svg"
+    full_path = os.path.join(path_name, fig_name)
+    plt.savefig(full_path, format="svg", dpi=1200)
+    plt.close()
+    print(f"Saved as chromosome-{c.c_id}.svg in the figs folder.")
