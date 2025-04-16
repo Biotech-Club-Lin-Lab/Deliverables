@@ -2,48 +2,78 @@ from genes import *
 import random
 import numpy as np
 
+import networkx as nx
+import matplotlib.pyplot as plt
+import os
+    
 class Chromosome:
-    def __init__(self, c_id:int, nodes:list[NodeGene]=None, edges:list[EdgeGene]=None):
-        self.c_id = c_id
+    def __init__(self, id:int, nodes:list[NodeGene]=None, edges:list[EdgeGene]=None, inputs:int=None, outputs:int=None, hidden:int=None):
+        self.id = id
+        
+        if nodes is None and edges is None:
+            connectivity_ratio = 0.75
+            nodes = []
+            edges = []
+            # Create iterables
+            input_ids = range(inputs)
+            hidden_ids = range(inputs, inputs + hidden)
+            output_ids = range(inputs + hidden, inputs + hidden + outputs)
+            # Create nodes per the number of inputs, outputs and hidden nodes
+            for _ in range(inputs): nodes.append(NodeGene(len(nodes), 'input'))
+            for _ in range(hidden): nodes.append(NodeGene(len(nodes), 1))
+            for _ in range(outputs): nodes.append(NodeGene(len(nodes), 'output'))
+            # Create edges between input and hidden nodes
+            for i in input_ids:
+                connectable_hidden = random.sample(hidden_ids, random.randint(int(hidden*connectivity_ratio), hidden))
+                for h in connectable_hidden:
+                    weight = np.random.uniform(-1, 1)
+                    edges.append(EdgeGene(len(edges), i, h, weight))
+            # Create edges between hidden and output nodes
+            for h in hidden_ids:
+                connectable_output = random.sample(output_ids, random.randint(int(outputs*connectivity_ratio), outputs))
+                for o in connectable_output:
+                    weight = np.random.uniform(-1, 1)
+                    edges.append(EdgeGene(len(edges), h, o, weight))
+
         self.nodes = nodes
         self.edges = edges
 
+    def show(self, width_scale:float=3.0, min_width:float=0.5, save:bool=False):
+        #print("Making graph")
 
-    #def __init__(self, c_id:int, inputs:int, outputs:int, hidden:int):
-    #    """
-    #    :param c_id: id of chromosome
-    #    :param inputs: number of inputs
-    #    :param hidden: number of hidden nodes
-    #    :param outputs: number of outputs
-    #    """
+        def create_directed_graph(c:Chromosome):
+            g = nx.DiGraph()
+            for node in c.nodes:
+                g.add_node(node.id, layer=node.layer)
+            for edge in c.edges:
+                g.add_edge(edge.node, edge.out_edge_to, weight=edge.weight)
+            return g
+        
+        def plot_chromosome(c:Chromosome, width_scale:float=3.0, min_width:float=0.5, save:bool=False):
 
-    #    connectivity_ratio = 0.75 #ratio of connections to nodes
-    #    nodes = []
-    #    edges = []
-    #    #Create iterables
-    #    input_ids = range(inputs)
-    #    hidden_ids = range(inputs, inputs + hidden)
-    #    output_ids = range(inputs + hidden, inputs + hidden + outputs)
+            g = create_directed_graph(c)
+            pos = nx.multipartite_layout(g, subset_key='layer', align='vertical', scale=1, center=None)
+            edge_weights = [g[u][v]['weight'] for u, v in g.edges()]
+            edge_widths = [max(min_width, abs(weight) * width_scale) for weight in edge_weights]
+            #print("Drawing graph")
+            nx.draw_networkx_nodes(g, pos, node_size=400)
+            nx.draw_networkx_labels(g, pos, font_size=10)
+            nx.draw_networkx_edges(g, pos, edgelist=g.edges(), width=edge_widths)
+            
+            if save:
+                #print("Saving graph")
+                path_name = "figs"
+                fig_name = f"chromosome-{self.id}.svg"
+                full_path = os.path.join(path_name, fig_name)
+                plt.savefig(full_path, format="svg", dpi=1200)
+                plt.close()
+                #print(f"Saved as chromosome-{self.id}.svg in the figs folder.")
+            else: plt.show()
 
-    #    #Create nodes per the number of inputs, outputs and hidden nodes
-    #    for _ in range(inputs): nodes.append(NodeGene(len(nodes), 'input'))
-    #    for _ in range(hidden): nodes.append(NodeGene(len(nodes), 1))
-    #    for _ in range(outputs): nodes.append(NodeGene(len(nodes), 'output'))
+        plot_chromosome(self, width_scale, min_width, save)
 
-    #    # Create edges between input and hidden nodes
-    #    for i in input_ids:
-    #        connectable_hidden = random.sample(hidden_ids, random.randint(int(hidden*connectivity_ratio), hidden)) #chooslower #bound
-    #        for h in connectable_hidden:
-    #            weight = np.random.uniform(-1, 1)
-    #            edges.append(EdgeGene(len(edges), i, h, weight))
 
-    #    # Create edges between hidden and output nodes
-    #        for h in hidden_ids:
-    #            connectable_output = random.sample(output_ids, random.randint(int(outputs*connectivity_ratio), outputs)) #choa #lower bound
-    #            for o in connectable_output:
-    #                    weight = np.random.uniform(-1, 1)
-    #                    edges.append(EdgeGene(len(edges), h, o, weight))
-
+   
 #=====================================================================================================================#
 
     #def add(self, edges):

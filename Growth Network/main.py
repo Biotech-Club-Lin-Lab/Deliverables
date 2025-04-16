@@ -3,7 +3,7 @@ from chromosome import Chromosome
 from visualization import plot_chromosome
 
 C0 = Chromosome(
-        c_id=0,
+        id=0,
         nodes=[
             NodeGene(0, 'input'),
             NodeGene(1, 'input'),
@@ -25,7 +25,7 @@ C0 = Chromosome(
      )
 
 C1 = Chromosome(
-    c_id=1,
+    id=1,
     nodes=[
         NodeGene(0, 'input'),
         NodeGene(1, 'input'),
@@ -42,7 +42,7 @@ C1 = Chromosome(
 )
 
 C2 = Chromosome(
-    c_id=2,
+    id=2,
     nodes=[
         NodeGene(0, 'input'),
         NodeGene(1, 'input'),

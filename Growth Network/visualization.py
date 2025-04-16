@@ -24,8 +24,8 @@ def plot_chromosome(c:Chromosome, width_scale:float=3.0, min_width:float=0.5):
     nx.draw_networkx_edges(g, pos, edgelist=g.edges(), width=edge_widths)
     print("Saving graph")
     path_name = "figs"
-    fig_name = f"chromosome-{c.c_id}.svg"
+    fig_name = f"chromosome-{c.id}.svg"
     full_path = os.path.join(path_name, fig_name)
     plt.savefig(full_path, format="svg", dpi=1200)
     plt.close()
-    print(f"Saved as chromosome-{c.c_id}.svg in the figs folder.")
+    print(f"Saved as chromosome-{c.id}.svg in the figs folder.")
