@@ -2,17 +2,19 @@ import pandas as pd
 
 class NodeGene:
 
-    def __init__(self, node_id:int, layer:str|int,activation_function:str='ReLU'):
+    def __init__(self, node_id:int, bias:float, layer:str|int, activation_function:str='ReLU'):
         """
     Node class represents the genetic encoding for a single neuron in a network.
 
     :param node_id: Unique identifier for the node
+    :param bias: Bias value for the node
     :param layer: Type of node (e.g., 'input', 'output' or a number for hidden layers)
     :param activation_function: Activation function for the node (default is 'ReLU')
     """
 
         self.id = node_id  # Unique identifier for the node
         self.layer = layer
+        self.bias = bias
         self.af = activation_function  # define code later
 
 
