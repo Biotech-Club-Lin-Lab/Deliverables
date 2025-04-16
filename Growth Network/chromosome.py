@@ -11,7 +11,7 @@ class Chromosome:
         self.id = id
         
         if nodes is None and edges is None:
-            connectivity_ratio = 0.75
+            connectivity_ratio = 0.5
             nodes = []
             edges = []
             # Create iterables
