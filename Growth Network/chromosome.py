@@ -39,8 +39,6 @@ class Chromosome:
         self.edges = edges
 
     def show(self, width_scale:float=3.0, min_width:float=0.5, save:bool=False):
-        #print("Making graph")
-
         def create_directed_graph(c:Chromosome):
             g = nx.DiGraph()
             for node in c.nodes:
@@ -48,68 +46,24 @@ class Chromosome:
             for edge in c.edges:
                 g.add_edge(edge.node, edge.out_edge_to, weight=edge.weight)
             return g
-        
-        def plot_chromosome(c:Chromosome, width_scale:float=3.0, min_width:float=0.5, save:bool=False):
 
+        def plot_chromosome(c:Chromosome, width_scale:float=3.0, min_width:float=0.5, save:bool=False):
             g = create_directed_graph(c)
             pos = nx.multipartite_layout(g, subset_key='layer', align='vertical', scale=1, center=None)
             edge_weights = [g[u][v]['weight'] for u, v in g.edges()]
             edge_widths = [max(min_width, abs(weight) * width_scale) for weight in edge_weights]
-            #print("Drawing graph")
+            edge_colors = ['green' if weight >= 0 else 'red' for weight in edge_weights]
             nx.draw_networkx_nodes(g, pos, node_size=400)
             nx.draw_networkx_labels(g, pos, font_size=10)
-            nx.draw_networkx_edges(g, pos, edgelist=g.edges(), width=edge_widths)
-            
+            nx.draw_networkx_edges(g, pos, edgelist=g.edges(), width=edge_widths, edge_color=edge_colors)
+
             if save:
-                #print("Saving graph")
                 path_name = "figs"
+                os.makedirs(path_name, exist_ok=True)
                 fig_name = f"chromosome-{self.id}.svg"
                 full_path = os.path.join(path_name, fig_name)
                 plt.savefig(full_path, format="svg", dpi=1200)
                 plt.close()
-                #print(f"Saved as chromosome-{self.id}.svg in the figs folder.")
             else: plt.show()
 
         plot_chromosome(self, width_scale, min_width, save)
-
-
-   
-#=====================================================================================================================#
-
-    #def add(self, edges):
-    #    """
-    #    Add an edge to the chromosome.
-
-    #    :param edges: Gene object to be added
-    #    """
-    #    self.edges.extend(edges.tolist())  # extended the gene to the list of genes
-
-    #def show(self):
-    #    output=pd.DataFrame()
-    #    for edge in self.edges:
-    #        df = edge.show()
-    #        output = pd.concat([output, df], ignore_index=True)
-    #    print(output) #jupyter will automatically display
-
-    #def create_adjacency_matrix(self):
-    #    """
-    #    Builds and returns the adjacency matrix from the gene connections.
-    #    Nodes are auto-discovered from genes.
-    #    """
-    #    # Find unique neuron IDs
-    #    neuron_ids = sorted(set(e.IN for e in self.edges) | set(e.OUT for e in self.edges))
-    #    neuron_to_index = {nid: idx for idx, nid in enumerate(neuron_ids)}
-
-    #    # Initialize matrix
-    #    n = len(neuron_ids)
-    #    matrix = np.zeros((n, n))
-
-    #    # Fill matrix using genes
-    #    for edge in self.edges:
-    #        if edge.enabled:
-    #            i = neuron_to_index[edge.IN]
-    #            j = neuron_to_index[edge.OUT]
-    #            matrix[i, j] = edge.weight  # directed from IN to OUT
-
-
-    #    return matrix, neuron_to_index

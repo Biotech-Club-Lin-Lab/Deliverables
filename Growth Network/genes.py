@@ -1,8 +1,6 @@
-import pandas as pd
 import random
 
 class NodeGene:
-
     def __init__(self, node_id:int, layer:str|int, bias:float=None, activation_function:str='ReLU'):
         """
     Node class represents the genetic encoding for a single neuron in a network.
@@ -35,20 +33,3 @@ class EdgeGene:
         self.out_edge_to = out_edge_to  # Output neuron
         self.weight = weight  # weight
         self.enabled = enabled  # Boolean indicating if the gene is enabled or disabled
-
-#    def show(sel#f, display=False):
-#        """
-#        Print gene information. currently uses pandas
-#        """
-#
-#        # Create a DataFrame to display gene information
-#        df = pd.DataFrame({
-#            'Gene ID': [self.id],
-#            'Input Neuron': [self.IN],
-#            'Output Neuron': [self.OUT],
-#            'Weight': [self.weight],
-#            'Enabled': [self.enabled]
-#        })
-#        # if display:
-#        #     display(df.T)
-#        return df

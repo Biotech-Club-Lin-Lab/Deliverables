@@ -1,6 +1,5 @@
 from genes import NodeGene, EdgeGene
 from chromosome import Chromosome
-from visualization import plot_chromosome
 
 C0 = Chromosome(
         id=0,
@@ -23,6 +22,7 @@ C0 = Chromosome(
             EdgeGene(7, 3, 5, 0.9),
         ]
      )
+C0.show(save=True)
 
 C1 = Chromosome(
     id=1,
@@ -40,6 +40,7 @@ C1 = Chromosome(
         EdgeGene(3, 2, 4, 1.0)
     ]
 )
+C1.show(save=True)
 
 C2 = Chromosome(
     id=2,
@@ -54,15 +55,18 @@ C2 = Chromosome(
     ],
     edges=[
         EdgeGene(0, 0, 2, 0.5),
-        EdgeGene(1, 1, 3, 0.6),
+        EdgeGene(1, 1, 3, -0.6),
         EdgeGene(2, 0, 4, 0.3),
-        EdgeGene(3, 1, 2, 0.1),
+        EdgeGene(3, 1, 2, -0.1),
         EdgeGene(4, 1, 4, 0.9),
         EdgeGene(5, 2, 5, 1.0),
         EdgeGene(6, 3, 5, 0.8),
-        EdgeGene(7, 3, 6, 0.7),
+        EdgeGene(7, 3, 6, -0.7),
         EdgeGene(8, 4, 6, 0.4),
         EdgeGene(9, 2, 6, 0.2)
     ]
 )
-plot_chromosome(C2)
+C2.show(save=True)
+
+C3 = Chromosome(id=3,inputs=2, hidden=3, outputs=3) #each run give different random net
+C3.show(save=True)
